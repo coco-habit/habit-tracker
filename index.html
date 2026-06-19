@@ -1,19 +1,283 @@
-6月15日(月)
-こんにちは🌤
-今日も習慣を続けよう🌱
-⏰
-✏️ 編集
-0 / 2 完了
-0%
-英単語
-⏰ アラーム 08:00
-🦜 ポポ
-ポポ
-ポポ、ずっと待ってるんだけど…
-やった！チェック ✓
-ストレッチ
-⏰ アラーム 20:00
-🐱 くろにゃん
-くろにゃん
-…あのさ。やる気あるの？
-やった！チェック ✓
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="theme-color" content="#58CC02"/>
+<title>今日の習慣🌱</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Hiragino Rounded Gothic Pro','Noto Sans JP',sans-serif;background:linear-gradient(160deg,#F0FBE4 0%,#FFF6E8 60%,#FEF0FB 100%);min-height:100vh;padding-bottom:60px;}
+button{font-family:inherit;cursor:pointer;border:none;}
+input{font-family:inherit;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:100;display:flex;align-items:flex-end;}
+.sheet{background:white;border-radius:28px 28px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:0 0 40px;box-shadow:0 -8px 40px rgba(0,0,0,0.2);}
+.si{padding:8px 20px 0;}
+@keyframes wiggle{0%,100%{transform:rotate(0deg)}20%{transform:rotate(-7deg)}40%{transform:rotate(7deg)}60%{transform:rotate(-4deg)}80%{transform:rotate(4deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-10px)}70%{transform:translateY(-4px)}}
+@keyframes pop{0%{transform:scale(0.8);opacity:0}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.wiggle{animation:wiggle 1.8s infinite;transform-origin:bottom center;display:inline-block;}
+.bounce{animation:bounce 0.6s ease;display:inline-block;}
+.pop{animation:pop 0.5s ease;}
+.fadein{animation:fadeIn 0.35s ease both;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var CHARS=[
+{id:"parrot",name:"ポポ",emoji:"🦜",color:"#58CC02",bg:"#E8F9D0",
+done:["すごーい！🎉 今日も頭がよくなったね！","やったね✨ ポポも鼻が高いよ！","完璧！さすがだね〜！🌟","えらい！ポポも嬉しいよ〜！"],
+urgent:["ねえねえ、まだ？早くやろうよ！","ポポ、ずっと待ってるんだけど…","もしかして忘れてる？！","今日もやらないの？ポポ悲しいな…","ちょっと！サボってない？！"]},
+{id:"blackcat",name:"くろにゃん",emoji:"🐱",color:"#555577",bg:"#EFEFEF",
+done:["…ふん。まあ、よくできたにゃ🖤","今日もしなやかだにゃ。認めてあげる。","完璧ね。くろにゃんも悪い気はしないにゃ✨","…べ、別に褒めてるわけじゃないにゃ。"],
+urgent:["…ねえ。まだなの？","体かたくなってるにゃ。わかってる？","別に心配してないけど…早くやってにゃ","もう！いいかげんにしてにゃ〜！","…あのさ。やる気あるの？"]},
+{id:"dog",name:"わんこ",emoji:"🐶",color:"#C8A96E",bg:"#FFF8EC",
+done:["わんわん！すごいすごい！🐶","やったー！いっしょにお祝いしよ！","えらい！大好き！もふもふ〜！","さすが！わんこ、感動したよ！"],
+urgent:["ねえねえ！まだ？まだ？わんわん！","わんこ、心配してるよ〜🐶","早くやって！お願い！","一緒にやろ！ほら！ほら！","もう待てない！わんわん！"]},
+{id:"rabbit",name:"ぴょん",emoji:"🐰",color:"#E8829A",bg:"#FFF0F5",
+done:["ぴょん！やったね〜！🐰","すごい！ぴょんぴょん嬉しい！","えらいえらい！よしよし〜✨","完璧！ぴょんも飛び跳ねちゃう！"],
+urgent:["ぴょん…まだやってないの？","忘れてない？心配だよ〜🐰","早くやって！ぴょんが待ってるよ！","もう〜！ちゃんとやってよ〜！","ぴょん、悲しい顔してるよ…"]},
+{id:"panda",name:"ぱんだろう",emoji:"🐼",color:"#444444",bg:"#F5F5F5",
+done:["もぐもぐ…え？できたの！？すごい！","笹を食べる手が止まっちゃった！えらい！","ぱんだろうも頑張ってるよ〜！✨","よしよし、今日もえらかった！"],
+urgent:["ねむい…でも、まだやってないよ？","笹食べながら見てるよ…早くやって🐼","ぱんだろう、ちょっと怒ってるよ？","もう！起きて！やって！","今日中にやってよ〜…頼むよ〜"]},
+{id:"penguin",name:"ぺんぺん",emoji:"🐧",color:"#3A86FF",bg:"#E8F0FF",
+done:["ぺんぺん！やったね！よかった〜！🐧","さすが！ぺんぺん、拍手してるよ！","完璧！南極でも自慢できるよ！✨","えらい！今日もかっこよかった！"],
+urgent:["ぺんぺん…まだなの？","寒い中ずっと待ってるよ〜🐧","早くやって！ぺんぺんが凍えちゃう！","もう〜！今すぐやってよ〜！","南極から応援してるよ！早く！"]},
+{id:"fox",name:"こんこん",emoji:"🦊",color:"#E8622A",bg:"#FFF0E8",
+done:["ふふ、さすがね。こんこんが認めてあげる🦊","やるじゃない！予想以上だったわ！","完璧！こんこんも嬉しいわ〜✨","さすが！一緒にいると退屈しないわね！"],
+urgent:["ねえ、まだなの？こんこん待ってるわよ🦊","忘れてるでしょ？ちゃんとやって！","こんこんをこれ以上待たせないで！","もう！さっさとやってちょうだい！","やる気ある？こんこん呆れてるわよ"]}
+];
+var tasks=JSON.parse(localStorage.getItem('tasks')||'null')||[
+{id:"1",name:"英単語",cid:"parrot",alarm:"08:00"},
+{id:"2",name:"ストレッチ",cid:"blackcat",alarm:"20:00"}
+];
+var doneMap=JSON.parse(localStorage.getItem('done_'+new Date().toDateString())||'{}');
+var streaks=JSON.parse(localStorage.getItem('streaks')||'{}');
+var msgIdx={};
+function save(){
+localStorage.setItem('tasks',JSON.stringify(tasks));
+localStorage.setItem('done_'+new Date().toDateString(),JSON.stringify(doneMap));
+localStorage.setItem('streaks',JSON.stringify(streaks));
+}
+function getChar(id){return CHARS.find(function(c){return c.id===id;})||CHARS[0];}
+function svg(id,happy,size){
+size=size||72;
+var s=size,h=happy;
+var svgs={
+parrot:function(){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="52" rx="22" ry="20" fill="#58CC02"/><circle cx="40" cy="30" r="18" fill="#58CC02"/><ellipse cx="40" cy="54" rx="13" ry="12" fill="#89E219"/><ellipse cx="20" cy="50" rx="8" ry="14" fill="#3DAA00" transform="rotate(-15 20 50)"/><ellipse cx="60" cy="50" rx="8" ry="14" fill="#3DAA00" transform="rotate(15 60 50)"/><circle cx="33" cy="26" r="6" fill="white"/><circle cx="47" cy="26" r="6" fill="white"/>'+(h?'<path d="M30 24 Q33 21 36 24" stroke="#222" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M44 24 Q47 21 50 24" stroke="#222" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse cx="27" cy="31" rx="5" ry="3" fill="#FF6666" opacity="0.5"/><ellipse cx="53" cy="31" rx="5" ry="3" fill="#FF6666" opacity="0.5"/>':'<circle cx="34" cy="28" r="3.5" fill="#222"/><circle cx="48" cy="28" r="3.5" fill="#222"/><circle cx="35" cy="26.5" r="1.2" fill="white"/><circle cx="49" cy="26.5" r="1.2" fill="white"/><path d="M29 22 Q33 20 36 23" stroke="#2D8A00" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M44 23 Q47 20 51 22" stroke="#2D8A00" stroke-width="2" fill="none" stroke-linecap="round"/>')+'<path d="M36 34 Q40 40 44 34" fill="#FFB800" stroke="#E09000" stroke-width="1"/><ellipse cx="40" cy="13" rx="4" ry="7" fill="#FF6B00" transform="rotate(-10 40 13)"/><ellipse cx="46" cy="11" rx="3" ry="6" fill="#FFB800" transform="rotate(10 46 11)"/><line x1="34" y1="70" x2="30" y2="76" stroke="#FFB800" stroke-width="2.5" stroke-linecap="round"/><line x1="34" y1="70" x2="34" y2="77" stroke="#FFB800" stroke-width="2.5" stroke-linecap="round"/><line x1="34" y1="70" x2="38" y2="76" stroke="#FFB800" stroke-width="2.5" stroke-linecap="round"/><line x1="46" y1="70" x2="42" y2="76" stroke="#FFB800" stroke-width="2.5" stroke-linecap="round"/><line x1="46" y1="70" x2="46" y2="77" stroke="#FFB800" stroke-width="2.5" stroke-linecap="round"/><line x1="46" y1="70" x2="50" y2="76" stroke="#FFB800" stroke-width="2.5" stroke-linecap="round"/></svg>';},
+blackcat:function(){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 80 80" fill="none"><path d="M62 60 Q78 48 72 34 Q68 26 61 33" stroke="#1A1A2E" stroke-width="9" fill="none" stroke-linecap="round"/><ellipse cx="40" cy="54" rx="22" ry="18" fill="#1A1A2E"/><circle cx="40" cy="30" r="19" fill="#1A1A2E"/><polygon points="22,18 17,3 33,14" fill="#1A1A2E"/><polygon points="23,17 19,7 31,14" fill="#FF9999" opacity="0.55"/><polygon points="58,18 63,3 47,14" fill="#1A1A2E"/><polygon points="57,17 61,7 49,14" fill="#FF9999" opacity="0.55"/><ellipse cx="40" cy="56" rx="13" ry="10" fill="#2D2D44"/>'+(h?'<path d="M27 29 Q33 23 39 29" stroke="#7CFC00" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M41 29 Q47 23 53 29" stroke="#7CFC00" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="27" cy="35" rx="4" ry="2.5" fill="#FF6B9D" opacity="0.4"/><ellipse cx="53" cy="35" rx="4" ry="2.5" fill="#FF6B9D" opacity="0.4"/>':'<ellipse cx="33" cy="29" rx="6" ry="7" fill="#7CFC00"/><ellipse cx="47" cy="29" rx="6" ry="7" fill="#7CFC00"/><ellipse cx="33" cy="29" rx="2.5" ry="6" fill="#111"/><ellipse cx="47" cy="29" rx="2.5" ry="6" fill="#111"/><circle cx="35" cy="26" r="1.5" fill="white"/><circle cx="49" cy="26" r="1.5" fill="white"/><path d="M27 22 Q33 19 38 23" stroke="#444" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M42 23 Q47 19 53 22" stroke="#444" stroke-width="2" fill="none" stroke-linecap="round"/>')+'<polygon points="40,36 37.5,39 42.5,39" fill="#FF6B9D"/>'+(h?'<path d="M36 39 Q40 44 44 39" stroke="#FF6B9D" stroke-width="1.5" fill="none"/>':'<path d="M37 40 Q40 38 43 40" stroke="#FF6B9D" stroke-width="1.5" fill="none"/>')+'<line x1="18" y1="36" x2="34" y2="38" stroke="#888" stroke-width="1.2" opacity="0.6"/><line x1="18" y1="40" x2="34" y2="40" stroke="#888" stroke-width="1.2" opacity="0.6"/><line x1="62" y1="36" x2="46" y2="38" stroke="#888" stroke-width="1.2" opacity="0.6"/><line x1="62" y1="40" x2="46" y2="40" stroke="#888" stroke-width="1.2" opacity="0.6"/><ellipse cx="30" cy="70" rx="8" ry="5" fill="#1A1A2E"/><ellipse cx="50" cy="70" rx="8" ry="5" fill="#1A1A2E"/></svg>';},
+dog:function(){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="54" rx="22" ry="18" fill="#C8A96E"/><circle cx="40" cy="30" r="19" fill="#C8A96E"/><ellipse cx="18" cy="28" rx="9" ry="16" fill="#A0784A" transform="rotate(-10 18 28)"/><ellipse cx="62" cy="28" rx="9" ry="16" fill="#A0784A" transform="rotate(10 62 28)"/><ellipse cx="40" cy="56" rx="14" ry="10" fill="#E8C98E"/><ellipse cx="40" cy="37" rx="10" ry="7" fill="#E8C98E"/><ellipse cx="40" cy="34" rx="5" ry="3.5" fill="#333"/>'+(h?'<path d="M27 27 Q33 22 39 27" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M41 27 Q47 22 53 27" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M33 38 Q40 46 47 38" stroke="#C0604A" stroke-width="2.5" fill="#FF8870" stroke-linecap="round"/><ellipse cx="28" cy="32" rx="5" ry="3" fill="#FF9999" opacity="0.5"/><ellipse cx="52" cy="32" rx="5" ry="3" fill="#FF9999" opacity="0.5"/>':'<circle cx="33" cy="27" r="4.5" fill="white"/><circle cx="47" cy="27" r="4.5" fill="white"/><circle cx="34" cy="28" r="3" fill="#333"/><circle cx="48" cy="28" r="3" fill="#333"/><circle cx="35" cy="26.5" r="1" fill="white"/><circle cx="49" cy="26.5" r="1" fill="white"/><path d="M30 23 Q33 21 36 24" stroke="#A0784A" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M44 24 Q47 21 50 23" stroke="#A0784A" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M35 39 Q40 37 45 39" stroke="#C0604A" stroke-width="2" fill="none" stroke-linecap="round"/>')+'<path d="M62 52 Q74 44 70 36" stroke="#C8A96E" stroke-width="7" fill="none" stroke-linecap="round"/><ellipse cx="30" cy="70" rx="8" ry="5" fill="#C8A96E"/><ellipse cx="50" cy="70" rx="8" ry="5" fill="#C8A96E"/></svg>';},
+rabbit:function(){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 80 80" fill="none"><ellipse cx="28" cy="10" rx="7" ry="18" fill="#F0D0D8" transform="rotate(-8 28 10)"/><ellipse cx="28" cy="10" rx="4" ry="14" fill="#FFB3C6" transform="rotate(-8 28 10)"/><ellipse cx="52" cy="10" rx="7" ry="18" fill="#F0D0D8" transform="rotate(8 52 10)"/><ellipse cx="52" cy="10" rx="4" ry="14" fill="#FFB3C6" transform="rotate(8 52 10)"/><ellipse cx="40" cy="54" rx="22" ry="18" fill="#F0D0D8"/><circle cx="40" cy="32" r="19" fill="#F0D0D8"/><ellipse cx="40" cy="56" rx="14" ry="10" fill="white"/><ellipse cx="27" cy="37" rx="6" ry="4" fill="#FFB3C6" opacity="0.6"/><ellipse cx="53" cy="37" rx="6" ry="4" fill="#FFB3C6" opacity="0.6"/><ellipse cx="40" cy="38" rx="3" ry="2" fill="#FF9DB5"/>'+(h?'<path d="M28 30 Q33 25 38 30" stroke="#888" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M42 30 Q47 25 52 30" stroke="#888" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M34 40 Q40 46 46 40" stroke="#FF6B9D" stroke-width="2" fill="none" stroke-linecap="round"/>':'<circle cx="33" cy="30" r="5" fill="white"/><circle cx="47" cy="30" r="5" fill="white"/><circle cx="34" cy="31" r="3.5" fill="#555"/><circle cx="48" cy="31" r="3.5" fill="#555"/><circle cx="35" cy="29.5" r="1.2" fill="white"/><circle cx="49" cy="29.5" r="1.2" fill="white"/><path d="M37 40 Q40 38 43 40" stroke="#FF9DB5" stroke-width="1.5" fill="none"/>')+'<line x1="20" y1="37" x2="35" y2="38" stroke="#ccc" stroke-width="1" opacity="0.8"/><line x1="20" y1="40" x2="35" y2="40" stroke="#ccc" stroke-width="1" opacity="0.8"/><line x1="60" y1="37" x2="45" y2="38" stroke="#ccc" stroke-width="1" opacity="0.8"/><line x1="60" y1="40" x2="45" y2="40" stroke="#ccc" stroke-width="1" opacity="0.8"/><ellipse cx="30" cy="70" rx="8" ry="5" fill="#F0D0D8"/><ellipse cx="50" cy="70" rx="8" ry="5" fill="#F0D0D8"/><circle cx="62" cy="58" r="6" fill="white"/></svg>';},
+panda:function(){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="54" rx="23" ry="19" fill="white"/><circle cx="40" cy="30" r="19" fill="white"/><circle cx="22" cy="14" r="9" fill="#222"/><circle cx="58" cy="14" r="9" fill="#222"/><ellipse cx="31" cy="28" rx="8" ry="7" fill="#222" transform="rotate(-10 31 28)"/><ellipse cx="49" cy="28" rx="8" ry="7" fill="#222" transform="rotate(10 49 28)"/><ellipse cx="22" cy="56" rx="10" ry="12" fill="#222"/><ellipse cx="58" cy="56" rx="10" ry="12" fill="#222"/><ellipse cx="40" cy="57" rx="13" ry="10" fill="white"/><circle cx="31" cy="28" r="4" fill="white"/><circle cx="49" cy="28" r="4" fill="white"/>'+(h?'<path d="M28 26 Q31 22 34 26" stroke="#222" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M46 26 Q49 22 52 26" stroke="#222" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse cx="28" cy="36" rx="5" ry="3" fill="#FF9999" opacity="0.5"/><ellipse cx="52" cy="36" rx="5" ry="3" fill="#FF9999" opacity="0.5"/><path d="M34 42 Q40 48 46 42" stroke="#555" stroke-width="2" fill="none" stroke-linecap="round"/>':'<circle cx="32" cy="29" r="3" fill="#222"/><circle cx="50" cy="29" r="3" fill="#222"/><circle cx="33" cy="27.5" r="1" fill="white"/><circle cx="51" cy="27.5" r="1" fill="white"/><path d="M36 42 Q40 40 44 42" stroke="#555" stroke-width="1.5" fill="none"/>')+'<ellipse cx="40" cy="37" rx="4" ry="2.5" fill="#333"/><ellipse cx="30" cy="70" rx="9" ry="5" fill="#222"/><ellipse cx="50" cy="70" rx="9" ry="5" fill="#222"/></svg>';},
+penguin:function(){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="54" rx="20" ry="20" fill="#1A1A2E"/><ellipse cx="40" cy="56" rx="13" ry="15" fill="white"/><circle cx="40" cy="28" r="17" fill="#1A1A2E"/><ellipse cx="40" cy="30" rx="11" ry="12" fill="white"/><ellipse cx="18" cy="54" rx="7" ry="14" fill="#1A1A2E" transform="rotate(10 18 54)"/><ellipse cx="62" cy="54" rx="7" ry="14" fill="#1A1A2E" transform="rotate(-10 62 54)"/>'+(h?'<path d="M30 26 Q35 21 40 26" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M40 26 Q45 21 50 26" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse cx="27" cy="31" rx="4" ry="2.5" fill="#FF9999" opacity="0.5"/><ellipse cx="53" cy="31" rx="4" ry="2.5" fill="#FF9999" opacity="0.5"/>':'<circle cx="34" cy="27" r="4.5" fill="white"/><circle cx="46" cy="27" r="4.5" fill="white"/><circle cx="35" cy="28" r="3" fill="#222"/><circle cx="47" cy="28" r="3" fill="#222"/><circle cx="36" cy="26.5" r="1" fill="white"/><circle cx="48" cy="26.5" r="1" fill="white"/><path d="M31 23 Q34 21 37 23" stroke="#444" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M43 23 Q46 21 49 23" stroke="#444" stroke-width="1.5" fill="none" stroke-linecap="round"/>')+'<polygon points="40,33 36,38 44,38" fill="#FF9600"/><ellipse cx="32" cy="72" rx="9" ry="4" fill="#FF9600" transform="rotate(-10 32 72)"/><ellipse cx="48" cy="72" rx="9" ry="4" fill="#FF9600" transform="rotate(10 48 72)"/><rect x="24" y="39" width="32" height="6" rx="3" fill="#E63946"/><rect x="24" y="39" width="32" height="3" rx="2" fill="#FF6B6B"/></svg>';},
+fox:function(){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="54" rx="22" ry="18" fill="#E8622A"/><path d="M62 58 Q80 50 76 36 Q73 28 64 34" stroke="#E8622A" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M72 34 Q76 28 70 28" stroke="white" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="40" cy="30" r="19" fill="#E8622A"/><polygon points="20,16 14,0 30,12" fill="#E8622A"/><polygon points="21,15 17,4 28,12" fill="#FFB3C6"/><polygon points="60,16 66,0 50,12" fill="#E8622A"/><polygon points="59,15 63,4 52,12" fill="#FFB3C6"/><ellipse cx="40" cy="35" rx="13" ry="11" fill="#FFF0E0"/><ellipse cx="22" cy="32" rx="7" ry="5" fill="#1A1A2E"/><ellipse cx="58" cy="32" rx="7" ry="5" fill="#1A1A2E"/><ellipse cx="40" cy="56" rx="13" ry="10" fill="#FFF0E0"/>'+(h?'<path d="M29 27 Q34 22 39 27" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M41 27 Q46 22 51 27" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse cx="29" cy="33" rx="4" ry="2.5" fill="#FF9999" opacity="0.5"/><ellipse cx="51" cy="33" rx="4" ry="2.5" fill="#FF9999" opacity="0.5"/><path d="M34 40 Q40 46 46 40" stroke="#C0604A" stroke-width="2" fill="none" stroke-linecap="round"/>':'<circle cx="33" cy="28" r="4.5" fill="white"/><circle cx="47" cy="28" r="4.5" fill="white"/><circle cx="34" cy="29" r="3" fill="#333"/><circle cx="48" cy="29" r="3" fill="#333"/><circle cx="35" cy="27.5" r="1" fill="white"/><circle cx="49" cy="27.5" r="1" fill="white"/><path d="M30 24 Q33 21 36 24" stroke="#C0501A" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M44 24 Q47 21 50 24" stroke="#C0501A" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M36 40 Q40 38 44 40" stroke="#C0604A" stroke-width="1.5" fill="none"/>')+'<ellipse cx="40" cy="36" rx="3.5" ry="2.5" fill="#333"/><ellipse cx="30" cy="70" rx="8" ry="5" fill="#E8622A"/><ellipse cx="50" cy="70" rx="8" ry="5" fill="#E8622A"/></svg>';}
+};
+return svgs[id]?svgs[id]():svgs['parrot']();
+}
+function el(tag,props,html){
+var e=document.createElement(tag);
+if(props)Object.keys(props).forEach(function(k){
+if(k==='style')Object.assign(e.style,props[k]);
+else if(k.startsWith('on'))e[k]=props[k];
+else e.setAttribute(k,props[k]);
+});
+if(html!==undefined)e.innerHTML=html;
+return e;
+}
+function render(){
+var root=document.getElementById('root');
+root.innerHTML='';
+var hour=new Date().getHours();
+var greeting=hour<12?'おはよう☀️':hour<18?'こんにちは🌤':'こんばんは🌙';
+var dc=tasks.filter(function(t){return doneMap[t.id];}).length;
+var pct=tasks.length>0?(dc/tasks.length)*100:0;
+var allDone=tasks.length>0&&tasks.every(function(t){return doneMap[t.id];});
+var hdr=el('div',{style:{background:'white',borderRadius:'0 0 28px 28px',padding:'24px 20px 20px',boxShadow:'0 4px 24px rgba(0,0,0,0.07)',marginBottom:'24px'}});
+var hdrTop=el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}});
+var hdrLeft=el('div',{});
+hdrLeft.appendChild(el('div',{style:{fontSize:'12px',color:'#CCC',fontWeight:'700',marginBottom:'2px'}},new Date().toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'short'})));
+hdrLeft.appendChild(el('div',{style:{fontSize:'24px',fontWeight:'900',color:'#222',lineHeight:'1.2'}},greeting));
+hdrLeft.appendChild(el('div',{style:{fontSize:'13px',color:'#AAA',fontWeight:'600',marginTop:'2px'}},'今日も習慣を続けよう🌱'));
+var hdrRight=el('div',{style:{display:'flex',gap:'8px'}});
+var btnAlarm=el('button',{style:{background:'linear-gradient(135deg,#FFF8E0,#FFFBE8)',border:'2px solid #FFD84D44',borderRadius:'20px',padding:'8px 12px',fontWeight:'700',fontSize:'12px',color:'#B8860B'},onclick:showAlarm},'⏰');
+var btnEdit=el('button',{style:{background:'linear-gradient(135deg,#F8F8F8,#F0F0F0)',border:'2px solid #EBEBEB',borderRadius:'20px',padding:'8px 16px',fontWeight:'700',fontSize:'12px',color:'#666'},onclick:showEdit},'✏️ 編集');
+hdrRight.appendChild(btnAlarm);hdrRight.appendChild(btnEdit);
+hdrTop.appendChild(hdrLeft);hdrTop.appendChild(hdrRight);
+hdr.appendChild(hdrTop);
+var prog=el('div',{style:{marginTop:'16px'}});
+var progTop=el('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:'6px'}});
+progTop.appendChild(el('span',{style:{fontSize:'12px',fontWeight:'800',color:'#58CC02'}},allDone?'🎉 全部完了！':dc+' / '+tasks.length+' 完了'));
+progTop.appendChild(el('span',{style:{fontSize:'12px',fontWeight:'700',color:'#CCC'}},Math.round(pct)+'%'));
+var bar=el('div',{style:{background:'#F0F0F0',borderRadius:'12px',height:'12px',overflow:'hidden'}});
+var fill=el('div',{style:{height:'12px',borderRadius:'12px',background:allDone?'linear-gradient(90deg,#58CC02,#FFB800)':'linear-gradient(90deg,#58CC02,#89E219)',width:pct+'%',transition:'width 0.6s'}});
+bar.appendChild(fill);prog.appendChild(progTop);prog.appendChild(bar);
+hdr.appendChild(prog);root.appendChild(hdr);
+var wrap=el('div',{style:{padding:'0 16px'}});
+if(tasks.length===0){
+var emp=el('div',{style:{textAlign:'center',padding:'48px 20px',background:'white',borderRadius:'24px',boxShadow:'0 4px 20px rgba(0,0,0,0.06)'}});
+emp.appendChild(el('div',{style:{fontSize:'52px',marginBottom:'12px'}},'🌱'));
+emp.appendChild(el('div',{style:{fontWeight:'800',color:'#222',fontSize:'16px',marginBottom:'16px'}},'習慣を追加してみよう！'));
+var addBtn=el('button',{style:{background:'linear-gradient(135deg,#58CC02,#89E219)',border:'none',borderRadius:'16px',padding:'12px 28px',color:'white',fontWeight:'900',fontSize:'14px'},onclick:showEdit},'＋ 追加する');
+emp.appendChild(addBtn);wrap.appendChild(emp);
+}
+tasks.forEach(function(t,i){
+var c=getChar(t.cid);
+var done=!!doneMap[t.id];
+var msgs=done?c.done:c.urgent;
+if(msgIdx[t.id]===undefined)msgIdx[t.id]=0;
+var msg=msgs[msgIdx[t.id]%msgs.length];
+var card=el('div',{style:{borderRadius:'24px',marginBottom:'16px',overflow:'hidden',boxShadow:done?'0 8px 32px '+c.color+'44':'0 4px 16px rgba(0,0,0,0.08)',border:'2.5px solid '+(done?c.color:'transparent'),transition:'all 0.35s'}});
+card.className='fadein';
+var top=el('div',{style:{background:done?'linear-gradient(135deg,'+c.color+','+c.color+'CC)':'linear-gradient(135deg,'+c.bg+','+c.bg+'88)',padding:'14px 18px 10px',display:'flex',justifyContent:'space-between',alignItems:'center'}});
+var tLeft=el('div',{});
+tLeft.appendChild(el('div',{style:{fontWeight:'900',fontSize:'17px',color:done?'white':'#222'}},t.name));
+if(t.alarm)tLeft.appendChild(el('div',{style:{fontSize:'11px',color:done?'rgba(255,255,255,0.8)':'#BBB',fontWeight:'600',marginTop:'2px'}},'⏰ アラーム '+t.alarm));
+var badge=el('div',{style:{background:done?'rgba(255,255,255,0.25)':'white',borderRadius:'20px',padding:'4px 10px',fontSize:'11px',fontWeight:'800',color:done?'white':c.color}},c.emoji+' '+c.name);
+top.appendChild(tLeft);top.appendChild(badge);card.appendChild(top);
+var body=el('div',{style:{background:'white',padding:'14px 18px 16px'}});
+var row=el('div',{style:{display:'flex',alignItems:'center',gap:'12px',marginBottom:'14px'}});
+var charWrap=el('div',{style:{flexShrink:'0'}});
+charWrap.className=done?'bounce':'wiggle';
+charWrap.innerHTML=svg(t.cid,done,68);
+var bubble=el('div',{style:{background:done?c.color+'15':'#F8F8F8',border:'2px solid '+(done?c.color+'44':'#EBEBEB'),borderRadius:'16px 16px 16px 6px',padding:'10px 13px',fontSize:'12.5px',color:'#333',fontWeight:'600',lineHeight:'1.6',flex:'1'}});
+bubble.appendChild(el('div',{style:{fontSize:'10px',color:c.color,fontWeight:'800',marginBottom:'3px'}},c.name));
+bubble.appendChild(el('div',{},msg));
+row.appendChild(charWrap);row.appendChild(bubble);body.appendChild(row);
+var btn=el('button',{style:{width:'100%',padding:'13px',borderRadius:'16px',border:'none',background:done?'linear-gradient(135deg,'+c.color+','+c.color+'DD)':'#F3F3F3',color:done?'white':'#C0C0C0',fontWeight:'900',fontSize:'15px',boxShadow:done?'0 6px 20px '+c.color+'55':'none',transition:'all 0.25s'},onclick:function(){toggle(t.id);}},done?'✅ 今日はできた！':'やった！チェック ✓');
+body.appendChild(btn);card.appendChild(body);wrap.appendChild(card);
+});
+var sb=tasks.filter(function(t){return streaks[t.id];});
+if(sb.length>0){
+var sk=el('div',{style:{background:'white',borderRadius:'20px',padding:'14px 18px',marginBottom:'16px',boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}});
+sk.appendChild(el('div',{style:{fontSize:'11px',fontWeight:'800',color:'#CCC',marginBottom:'10px'}},'🔥 連続記録'));
+var sr=el('div',{style:{display:'flex',gap:'8px',flexWrap:'wrap'}});
+sb.forEach(function(t){
+var c=getChar(t.cid);
+var bd=el('div',{style:{background:c.bg,border:'2px solid '+c.color+'44',borderRadius:'12px',padding:'6px 12px',display:'flex',alignItems:'center',gap:'6px'}});
+bd.appendChild(el('span',{style:{fontSize:'14px'}},c.emoji));
+bd.appendChild(el('span',{style:{fontSize:'12px',fontWeight:'800',color:c.color}},t.name+' '+(streaks[t.id]||0)+'日連続'));
+sr.appendChild(bd);
+});
+sk.appendChild(sr);wrap.appendChild(sk);
+}
+if(allDone){
+var cel=el('div',{style:{background:'linear-gradient(135deg,#58CC02,#89E219,#FFB800)',borderRadius:'24px',padding:'24px 20px',textAlign:'center',color:'white',boxShadow:'0 12px 40px rgba(88,204,2,0.4)'}});
+cel.className='pop';
+cel.appendChild(el('div',{style:{fontSize:'52px',marginBottom:'8px'}},'🎉'));
+cel.appendChild(el('div',{style:{fontSize:'20px',fontWeight:'900',marginBottom:'4px'}},'今日のミッション完了！'));
+cel.appendChild(el('div',{style:{fontSize:'13px',opacity:'0.9'}},'みんな大喜び✨ また明日もいっしょに頑張ろうね！'));
+var cp=el('div',{style:{display:'flex',justifyContent:'center',gap:'4px',marginTop:'14px'}});
+tasks.forEach(function(t){var sp=el('span',{});sp.innerHTML=svg(t.cid,true,40);cp.appendChild(sp);});
+cel.appendChild(cp);wrap.appendChild(cel);
+}
+root.appendChild(wrap);
+tasks.forEach(function(t){
+setTimeout(function(){
+setInterval(function(){msgIdx[t.id]=(msgIdx[t.id]||0)+1;render();},4000);
+},Math.random()*2000);
+});
+}
+function toggle(id){
+doneMap[id]=!doneMap[id];
+if(doneMap[id])streaks[id]=(streaks[id]||0)+1;
+save();render();
+}
+function showAlarm(){
+var ov=el('div',{style:{position:'fixed',inset:'0',background:'rgba(0,0,0,0.55)',zIndex:'200',display:'flex',alignItems:'flex-end'}});
+var sh=el('div',{style:{background:'white',borderRadius:'28px 28px 0 0',width:'100%',maxHeight:'85vh',overflowY:'auto',padding:'0 0 40px',boxShadow:'0 -8px 40px rgba(0,0,0,0.2)'}});
+var hnd=el('div',{style:{display:'flex',justifyContent:'center',padding:'14px 0 4px'}});
+hnd.appendChild(el('div',{style:{width:'40px',height:'4px',borderRadius:'2px',background:'#DDD'}}));
+sh.appendChild(hnd);
+var si=el('div',{style:{padding:'8px 20px 0'}});
+var top=el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'20px'}});
+top.appendChild(el('span',{style:{fontWeight:'900',fontSize:'19px',color:'#222'}},'⏰ アラームの設定方法'));
+var cls=el('button',{style:{background:'#F3F3F3',border:'none',borderRadius:'20px',padding:'7px 16px',fontWeight:'700',color:'#666',fontSize:'13px'},onclick:function(){ov.remove();}},'閉じる');
+top.appendChild(cls);si.appendChild(top);
+var hint=el('div',{style:{background:'linear-gradient(135deg,#E8F9D0,#FFF8E0)',border:'2px solid #58CC0244',borderRadius:'18px',padding:'14px 16px',marginBottom:'20px'}});
+hint.appendChild(el('div',{style:{fontSize:'13px',fontWeight:'800',color:'#3DAA00',marginBottom:'4px'}},'💡 ポイント'));
+hint.appendChild(el('div',{style:{fontSize:'12px',color:'#666',lineHeight:'1.7'}},'Androidの時計アプリでアラームを設定して、ラベルに習慣名を入れるだけ！アラームが鳴ったらこのアプリを開いてね🌱'));
+si.appendChild(hint);
+tasks.forEach(function(t){
+var c=getChar(t.cid);
+var row=el('div',{style:{borderRadius:'18px',marginBottom:'12px',overflow:'hidden',border:'2px solid '+c.color+'33'}});
+var th=el('div',{style:{background:'linear-gradient(135deg,'+c.bg+','+c.bg+'88)',padding:'10px 14px',display:'flex',alignItems:'center',gap:'10px'}});
+var ci=el('span',{});ci.innerHTML=svg(t.cid,false,36);
+th.appendChild(ci);
+var td=el('div',{});
+td.appendChild(el('div',{style:{fontWeight:'900',fontSize:'15px',color:'#222'}},t.name));
+td.appendChild(el('div',{style:{fontSize:'11px',color:c.color,fontWeight:'700'}},c.emoji+' '+c.name+'が待ってるよ！'));
+th.appendChild(td);row.appendChild(th);
+var bd=el('div',{style:{background:'white',padding:'12px 16px'}});
+bd.appendChild(el('div',{style:{fontSize:'12px',color:'#888',marginBottom:'10px',fontWeight:'600'}},'Androidの時計アプリでこう設定しよう：'));
+[['1','時計アプリを開く'],['2','時刻を「'+(t.alarm||'好きな時間')+'」に設定'],['3','ラベルに「'+t.name+'の時間だよ！」と入力'],['4','繰り返しを「毎日」に設定して保存']].forEach(function(step){
+var sr=el('div',{style:{display:'flex',gap:'10px',alignItems:'flex-start',marginBottom:'8px'}});
+var sn=el('div',{style:{width:'22px',height:'22px',borderRadius:'50%',flexShrink:'0',background:c.color,color:'white',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'11px',fontWeight:'900'}},step[0]);
+sr.appendChild(sn);sr.appendChild(el('div',{style:{fontSize:'13px',color:'#333',fontWeight:'600',paddingTop:'2px'}},step[1]));
+bd.appendChild(sr);
+});
+row.appendChild(bd);si.appendChild(row);
+});
+sh.appendChild(si);ov.appendChild(sh);document.body.appendChild(ov);
+}
+function showEdit(){
+var editTasks=tasks.map(function(t){return Object.assign({},t);});
+var ov=el('div',{style:{position:'fixed',inset:'0',background:'rgba(0,0,0,0.55)',zIndex:'100',display:'flex',alignItems:'flex-end'}});
+var sh=el('div',{style:{background:'white',borderRadius:'28px 28px 0 0',width:'100%',maxHeight:'92vh',overflowY:'auto',padding:'0 0 40px',boxShadow:'0 -8px 40px rgba(0,0,0,0.2)'}});
+var hnd=el('div',{style:{display:'flex',justifyContent:'center',padding:'14px 0 4px'}});
+hnd.appendChild(el('div',{style:{width:'40px',height:'4px',borderRadius:'2px',background:'#DDD'}}));
+sh.appendChild(hnd);
+var si=el('div',{style:{padding:'8px 20px 0'}});
+function reRender(){
+si.innerHTML='';
+var top=el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'16px'}});
+top.appendChild(el('span',{style:{fontWeight:'900',fontSize:'19px',color:'#222'}},'習慣を編集'));
+var cls=el('button',{style:{background:'#F3F3F3',border:'none',borderRadius:'20px',padding:'7px 16px',fontWeight:'700',color:'#666',fontSize:'13px'},onclick:function(){ov.remove();}},'閉じる');
+top.appendChild(cls);si.appendChild(top);
+editTasks.forEach(function(t,idx){
+var c=getChar(t.cid);
+var card=el('div',{style:{borderRadius:'20px',marginBottom:'14px',overflow:'hidden',border:'2px solid '+c.color+'33',boxShadow:'0 2px 12px '+c.color+'15'}});
+var th=el('div',{style:{background:'linear-gradient(135deg,'+c.bg+','+c.bg+'88)',padding:'12px 14px',display:'flex',gap:'8px',alignItems:'center'}});
+var inp=el('input',{style:{flex:'1',border:'2px solid '+c.color+'44',borderRadius:'10px',padding:'8px 12px',fontWeight:'800',fontSize:'15px',outline:'none',background:'white',color:'#222'},value:t.name});
+inp.oninput=function(){editTasks[idx].name=this.value;};
+var del=el('button',{style:{background:'#FFE8E8',border:'none',borderRadius:'10px',padding:'8px 12px',color:'#E85555',fontWeight:'700',fontSize:'12px'},onclick:function(){editTasks.splice(idx,1);reRender();}},'削除');
+th.appendChild(inp);th.appendChild(del);card.appendChild(th);
+var bd=el('div',{style:{padding:'12px 14px',background:'white'}});
+bd.appendChild(el('div',{style:{fontSize:'11px',color:'#AAA',fontWeight:'800',marginBottom:'8px'}},'キャラクターを選ぶ'));
+var cr=el('div',{style:{display:'flex',gap:'6px',overflowX:'auto',paddingBottom:'8px'}});
+CHARS.forEach(function(ch){
+var cb=el('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:'3px',cursor:'pointer',padding:'8px 5px',borderRadius:'14px',minWidth:'66px',flexShrink:'0',border:'2.5px solid '+(t.cid===ch.id?ch.color:'#EEE'),background:t.cid===ch.id?ch.bg:'#FAFAFA'}});
+cb.innerHTML=svg(ch.id,false,42);
+cb.appendChild(el('span',{style:{fontSize:'10px',fontWeight:'800',color:t.cid===ch.id?ch.color:'#BBB'}},ch.name));
+cb.onclick=function(){editTasks[idx].cid=ch.id;reRender();};
+cr.appendChild(cb);
+});
+bd.appendChild(cr);
+var alm=el('div',{style:{marginTop:'6px',padding:'10px 12px',background:'#F8F8F8',borderRadius:'12px'}});
+alm.appendChild(el('div',{style:{fontSize:'12px',fontWeight:'700',color:'#555',marginBottom:'6px'}},'⏰ アラームの目安時刻（メモ用）'));
+var ti=el('input',{type:'time',style:{width:'100%',border:'2px solid '+c.color+'44',borderRadius:'10px',padding:'9px 12px',fontSize:'17px',fontWeight:'800',outline:'none',color:c.color,background:'white'},value:t.alarm||'08:00'});
+ti.oninput=function(){editTasks[idx].alarm=this.value;};
+alm.appendChild(ti);
+alm.appendChild(el('div',{style:{fontSize:'11px',color:'#BBB',marginTop:'6px',fontWeight:'600'}},'※ この時刻をAndroidの時計アプリに設定してね'));
+bd.appendChild(alm);card.appendChild(bd);si.appendChild(card);
+});
+var addBtn=el('button',{style:{width:'100%',padding:'13px',borderRadius:'16px',border:'2.5px dashed #DDD',background:'white',color:'#CCC',fontWeight:'800',fontSize:'14px',marginBottom:'14px'},onclick:function(){editTasks.push({id:Date.now().toString(),name:'新しい習慣',cid:'parrot',alarm:'08:00'});reRender();}},'＋ 習慣を追加');
+si.appendChild(addBtn);
+var sav=el('button',{style:{width:'100%',padding:'15px',borderRadius:'16px',border:'none',background:'linear-gradient(135deg,#58CC02,#89E219)',color:'white',fontWeight:'900',fontSize:'16px',boxShadow:'0 6px 20px #58CC0244'},onclick:function(){
+tasks=editTasks.map(function(t){return Object.assign({},t);});
+var nd={};tasks.forEach(function(t){if(doneMap[t.id])nd[t.id]=true;});
+doneMap=nd;save();ov.remove();render();
+}},'保存する ✓');
+si.appendChild(sav);
+}
+reRender();
+sh.appendChild(si);ov.appendChild(sh);document.body.appendChild(ov);
+}
+window.showAlarm=showAlarm;
+window.showEdit=showEdit;
+window.toggle=toggle;
+render();
+</script>
+</body>
+</html>
