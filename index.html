@@ -173,11 +173,15 @@ tasks.forEach(function(t){var sp=el('span',{});sp.innerHTML=svg(t.cid,true,40);c
 cel.appendChild(cp);wrap.appendChild(cel);
 }
 root.appendChild(wrap);
-tasks.forEach(function(t){
+tasks.forEach(function(t){startMsgRotation(t);});
+}
+var msgRotationStarted={};
+function startMsgRotation(t){
+if(msgRotationStarted[t.id])return;
+msgRotationStarted[t.id]=true;
 setTimeout(function(){
 setInterval(function(){msgIdx[t.id]=(msgIdx[t.id]||0)+1;render();},4000);
 },Math.random()*2000);
-});
 }
 function toggle(id){
 doneMap[id]=!doneMap[id];
