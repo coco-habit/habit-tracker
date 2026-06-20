@@ -143,7 +143,7 @@ charWrap.className=done?'bounce':'wiggle';
 charWrap.innerHTML=svg(t.cid,done,68);
 var bubble=el('div',{style:{background:done?c.color+'15':'#F8F8F8',border:'2px solid '+(done?c.color+'44':'#EBEBEB'),borderRadius:'16px 16px 16px 6px',padding:'10px 13px',fontSize:'12.5px',color:'#333',fontWeight:'600',lineHeight:'1.6',flex:'1'}});
 bubble.appendChild(el('div',{style:{fontSize:'10px',color:c.color,fontWeight:'800',marginBottom:'3px'}},c.name));
-bubble.appendChild(el('div',{},msg));
+bubble.appendChild(el('div',{id:'msg-'+t.id},msg));
 row.appendChild(charWrap);row.appendChild(bubble);body.appendChild(row);
 var btn=el('button',{style:{width:'100%',padding:'13px',borderRadius:'16px',border:'none',background:done?'linear-gradient(135deg,'+c.color+','+c.color+'DD)':'#F3F3F3',color:done?'white':'#C0C0C0',fontWeight:'900',fontSize:'15px',boxShadow:done?'0 6px 20px '+c.color+'55':'none',transition:'all 0.25s'},onclick:function(){toggle(t.id);}},done?'✅ 今日はできた！':'やった！チェック ✓');
 body.appendChild(btn);card.appendChild(body);wrap.appendChild(card);
@@ -180,7 +180,15 @@ function startMsgRotation(t){
 if(msgRotationStarted[t.id])return;
 msgRotationStarted[t.id]=true;
 setTimeout(function(){
-setInterval(function(){msgIdx[t.id]=(msgIdx[t.id]||0)+1;render();},4000);
+setInterval(function(){
+msgIdx[t.id]=(msgIdx[t.id]||0)+1;
+var c=getChar(t.cid);
+var done=!!doneMap[t.id];
+var msgs=done?c.done:c.urgent;
+var msg=msgs[msgIdx[t.id]%msgs.length];
+var msgEl=document.getElementById('msg-'+t.id);
+if(msgEl)msgEl.textContent=msg;
+},4000);
 },Math.random()*2000);
 }
 function toggle(id){
